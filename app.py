@@ -19,8 +19,8 @@ humidity_collection = db.get_collection(DATABASE_COLLECTION)
 
 # Ubidots Configuration
 UBIDOTS_TOKEN = os.getenv("UBIDOTS_TOKEN")
-UBIDOTS_DEVICE = "esp32"
-UBIDOTS_VARIABLES = ["humidity", "temperature"]
+UBIDOTS_DEVICE = "ESP32"
+UBIDOTS_VARIABLES = ["humidity", "temperature", "batery"]
 
 try:
     client.admin.command('ping')
@@ -31,7 +31,7 @@ except Exception as e:
 
 def send_to_ubidots(data):
     """Send data to Ubidots"""
-    url = f"https://industrial.api.ubidots.com/api/v2.0/devices/{UBIDOTS_DEVICE}/"
+    url = f"https://industrial.api.ubidots.com/api/v1.6/devices/{UBIDOTS_DEVICE}/"
     headers = {"X-Auth-Token": UBIDOTS_TOKEN, "Content-Type": "application/json"}
     response = requests.post(url, json=data, headers=headers)
 
@@ -93,15 +93,10 @@ def post_humidity(token):
             "batery": data["batery"],
         }
     )
-
     return (
-        jsonify(
-            {
-                "message": "Data saved successfully",
-                "data": new_record,
-                "ubidots": ubidots_response,
-            }
-        ),
+        {
+          "message": "Data sent to Ubidots",
+        },
         201,
     )
 

@@ -55,7 +55,7 @@ def show_humidity(token):
         {
             "humidity": latest_data.get("humidity", "N/A"),
             "temperature": latest_data.get("temperature", "N/A"),
-            "timestamp": latest_data.get("timestamp", "N/A"),
+            "batery": latest_data.get("batery", "N/A"),
         }
     )
 
@@ -72,7 +72,7 @@ def post_humidity(token):
     new_record = {
         "humidity": data["humidity"],
         "temperature": data["temperature"],
-        "timestamp": datetime.utcnow(),
+        "batery": data["batery"],
     }
 
     # Store in MongoDB
@@ -80,7 +80,11 @@ def post_humidity(token):
 
     # Send to Ubidots
     ubidots_response = send_to_ubidots(
-        {"humidity": data["humidity"], "temperature": data["temperature"]}
+        {
+            "humidity": data["humidity"],
+            "temperature": data["temperature"],
+            "batery": data["batery"],
+        }
     )
 
     return (

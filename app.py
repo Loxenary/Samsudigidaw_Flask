@@ -2,6 +2,7 @@ import os
 import requests
 from flask import Flask, abort, jsonify, request
 from pymongo import MongoClient
+from pymongo.server_api import ServerApi
 from datetime import datetime
 import config
 
@@ -12,7 +13,7 @@ MONGO_URI = os.getenv("MONGO_SRV_URI")
 DATABASE_NAME = os.getenv("DATABASE_NAME")
 DATABASE_COLLECTION = os.getenv("DATABASE_COLLECTION")
 
-client = MongoClient(MONGO_URI)
+client = MongoClient(MONGO_URI, server_api=ServerApi('1'))
 db = client.get_database(DATABASE_NAME)
 humidity_collection = db.get_collection(DATABASE_COLLECTION)
 
@@ -20,6 +21,12 @@ humidity_collection = db.get_collection(DATABASE_COLLECTION)
 UBIDOTS_TOKEN = os.getenv("UBIDOTS_TOKEN")
 UBIDOTS_DEVICE = "esp32"
 UBIDOTS_VARIABLES = ["humidity", "temperature"]
+
+try:
+    client.admin.command('ping')
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+except Exception as e:
+    print(e)
 
 
 def send_to_ubidots(data):

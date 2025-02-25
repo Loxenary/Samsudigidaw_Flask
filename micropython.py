@@ -3,12 +3,12 @@ import dht
 import time
 import network
 import ujson
-import requests
+import urequests
 
 led = Pin(2, Pin.OUT)
 led.off()
 sensor = dht.DHT11(Pin(5))
-data = {}
+data = {"temperature": None, "humidity": None, "batery": None}
 ip = ""
 token = "DavisSudahMandi"
 
@@ -29,7 +29,7 @@ print("IP Address:", ip)
 try:
     print("HELLO CHECK API CONNECTION")
     url = "https://samsudigidaw.vtriadi.site/health"
-    response = requests.get(url)
+    response = urequests.get(url)
     if response.status_code == 200:
         print("Connection to API Successfull")
     else:
@@ -54,12 +54,15 @@ while True:
             led.on()
             data = temp_data.copy()
             print(data)
-            requests.post(
+            response = urequests.post(
                 "https://samsudigidaw.vtriadi.site/data/" + token,
                 json=data,
                 headers={"Content-Type": "application/json"},
+                timeout=5
             )
             print("POST DATA")
+            print(response)
+            response.close()
             time.sleep(1)
             led.off()
     except OSError as e:
@@ -67,3 +70,4 @@ while True:
         time.sleep(1)
         print("Failed to read sensor.")
         led.off()
+
